@@ -1,0 +1,86 @@
+/// @title SetGet Contract
+/// @dev A basic "Setter Getter" example contract written in Huff,
+///      obviously not audited, for educational purposes only!
+/// @author clemlak
+
+/// Interface ///
+
+// Defines `set` and `get` functions using the ABI format
+#define function set(uint256) nonpayable returns ()
+#define function get() view returns (uint256)
+
+/// Storage slots ///
+
+// Defines the constant `VAR_LOCATION` pointing to the next
+// free storage slot
+#define constant VAR_LOCATION = FREE_STORAGE_POINTER()
+
+/// Macros ///
+
+/// @dev Reads the first calldata parameter as a uint256 and
+///      saves its value into the [VAR_LOCATION] storage slot
+#define macro SET() = takes (1) returns (0) {
+    // Puts the calldata into the stack but omits the first
+    // 4 bytes corresponding to the function signature
+    0x04 calldataload
+
+    // Stores the last value of the stack into the
+    // [VAR_LOCATION] storage slot
+    [VAR_LOCATION] sstore
+
+    // Halts the execution without returning anything
+    0x00 0x00 return
+}
+
+/// @dev Returns the value stored into the [VAR_LOCATION] storage slot
+#define macro GET() = takes (0) returns (1) {
+  // Puts the value stored into the [VAR_LOCATION] storage
+  // slot into the stack
+  [VAR_LOCATION] sload
+
+  // Saves the last value from the stack into memory at 0x00
+  0x00 mstore
+
+  // Returns the first 32 bytes of value saved in the memory
+  0x20 0x00 return
+}
+
+// @dev Main macro
+#define macro MAIN() = takes(0) returns (0) {
+  // Puts the calldata into the stack
+  0x00 calldataload
+
+  // Shifts all the data by 224 bits (28 bytes) to the right
+  // to keep only the function signature (first 4 bytes)
+  0xe0 shr
+
+  // Duplicates the function signature into the stack
+  dup1
+
+  // Checks if the function signature into the stack equals
+  // `0x60fe47b1` (signature of `set(uint256)`)
+  0x60fe47b1 eq
+
+  // Jumps to the `set` destination only if the last element
+  // of the stack is `1` (true)
+  set jumpi
+
+  // Duplicates again the function signature into the stack
+  dup1
+
+  // Checks if the function signature into the stack equals
+  // `0x6d4ce63c` (signature of `get()`)
+  0x6d4ce63c eq
+
+  // Jumps to the `get` destination only if the last element
+  // of the stack is `1` (true)
+  get jumpi
+
+  // Defines the `set` jump destination as the `SET()` macro
+  set:
+    SET()
+
+  // Defines the `get` jump destination as the `GET()` macro
+  get:
+    GET()
+}
