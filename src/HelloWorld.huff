@@ -1,22 +1,22 @@
 #define function helloWorld() view returns (string memory)
 
 #define macro HELLOWORLD() = takes (0) returns (0) {
-  0x20 0x00 mstore
-  0x0d 0x20 mstore
-  __RIGHTPAD(0x48656c6c6f2c20576f726c6421) 0x40 mstore
-  0x20 0x00 mstore
-  0x60 0x00 return
+    0x20 0x00 mstore
+    0x0d 0x20 mstore
+    __RIGHTPAD(0x48656c6c6f2c20576f726c6421) 0x40 mstore
+    0x20 0x00 mstore
+    0x60 0x00 return
 }
 
 #define macro MAIN() = takes (0) returns (0) {
-  0x00 calldataload
-  0xe0 shr
-  dup1
-  __FUNC_SIG(helloWorld) eq
-  helloWorld jumpi
+    0x00 calldataload
+    0xe0 shr
+    dup1
+    __FUNC_SIG(helloWorld) eq
+    helloWorld jumpi
 
-  0x00 0x00 revert
+    0x00 0x00 revert
 
-  helloWorld:
-    HELLOWORLD()
+    helloWorld:
+        HELLOWORLD()
 }
