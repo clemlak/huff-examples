@@ -13,9 +13,8 @@ contract HelloWorldTest is Test {
     }
 
     function testHelloWorld() public {
-      string memory a = "Hello, world!";
-      string memory b = helloWorld.helloWorld();
-      assertEq(a, b);
+        string memory b = helloWorld.helloWorld();
+        assertEq("Hello, World!", b);
     }
 }
 
